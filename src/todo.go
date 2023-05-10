@@ -1,7 +1,7 @@
 package main
 
 type Todo struct {
-	ID        int    `json:"id"`
+	ID        *int   `json:"id"`
 	Title     string `json:"title"`
 	Completed bool   `json:"completed"`
 }
