@@ -1,4 +1,4 @@
-package src
+package main
 
 import (
 	"github.com/gin-gonic/gin"
@@ -19,5 +19,14 @@ func main() {
 		})
 	})
 
-	r.Run() // listen and serve
+	// TODO: add
+	r.GET("/getItems", GetItems)
+	r.POST("/addItem", AddItem)
+	r.POST("/deleteItem", DeleteItem)
+	r.POST("/updateItem", UpdateItem)
+
+	// listen and serve
+	if err := r.Run(":3000"); err != nil {
+		log.Fatal(err)
+	}
 }
