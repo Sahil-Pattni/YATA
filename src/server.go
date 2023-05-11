@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 type App struct {
@@ -43,11 +44,34 @@ func (app *App) add(c *gin.Context) {
 }
 
 func (app *App) delete(c *gin.Context) {
-	// TODO: implement
+	// Get the id and convert it to an int
+	id, _ := strconv.Atoi(c.Param("id"))
+	if err := DeleteItem(app.DB, id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	} else {
+		c.Status(http.StatusOK)
+	}
 }
 
 func (app *App) update(c *gin.Context) {
-	// TODO: implement
+	// Get the id and convert it to an int
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	// Receive the item
+	var item Todo
+	if err := c.BindJSON(&item); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Update the item
+	if err := UpdateItem(app.DB, id, &item); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	} else {
+		c.Status(http.StatusOK)
+	}
 }
 
 func (app *App) Initialize() error {
@@ -76,8 +100,8 @@ func main() {
 
 	r.GET("/getItems", app.items)
 	r.POST("/addItem", app.add)
-	r.POST("/deleteItem", app.delete)
-	r.POST("/updateItem", app.update)
+	r.DELETE("/deleteItem/:id", app.delete)
+	r.PATCH("/updateItem/:id", app.update)
 
 	// listen and serve
 	if err := r.Run(":3000"); err != nil {

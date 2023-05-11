@@ -53,3 +53,52 @@ func AddItem(db *sql.DB, item *Todo) error {
 
 	return nil
 }
+
+// Delete item
+func DeleteItem(db *sql.DB, id int) error {
+	// Execute the delete statement
+	_, err := db.Exec("DELETE FROM todo WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Update item
+// Update item
+func UpdateItem(db *sql.DB, id int, item *Todo) error {
+	// Build the SQL query
+	query := "UPDATE todo SET "
+	args := []interface{}{}
+
+	// Check if Title is specified
+	if item.Title != nil {
+		query += "title = ?, "
+		args = append(args, item.Title)
+	}
+
+	// Check if Completed is specified
+	if item.Completed != nil {
+		query += "completed = ?, "
+		args = append(args, *item.Completed)
+	}
+
+	// Remove the trailing comma if either Title or Completed is present
+	if len(args) > 0 {
+		query = query[:len(query)-2] // Remove the last ", "
+	} else {
+		// If neither Title nor Completed is specified, return nil without executing the query
+		return nil
+	}
+
+	query += " WHERE id = ?"
+	args = append(args, id)
+
+	// Execute the update query
+	_, err := db.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
